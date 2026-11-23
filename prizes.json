@@ -1,0 +1,178 @@
+[
+ {
+  "name": "充电风扇",
+  "price": 0,
+  "tier": "purple",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_01_fan.png"
+ },
+ {
+  "name": "LED 手持工作灯",
+  "price": 0,
+  "tier": "purple",
+  "cells": 2,
+  "flip": false,
+  "image": "images/prizes/prize_02_led_light.png"
+ },
+ {
+  "name": "角磨机",
+  "price": 0,
+  "tier": "purple",
+  "cells": 2,
+  "flip": true,
+  "image": "images/prizes/prize_03_grinder.png"
+ },
+ {
+  "name": "不锈钢吸尘器（大）",
+  "price": 0,
+  "tier": "red",
+  "cells": 6,
+  "flip": false,
+  "image": "images/prizes/prize_04_vacuum_30l.png"
+ },
+ {
+  "name": "高压清洗机",
+  "price": 0,
+  "tier": "gold",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_05_pressure_washer.png"
+ },
+ {
+  "name": "不锈钢吸尘器（小）",
+  "price": 0,
+  "tier": "red",
+  "cells": 6,
+  "flip": false,
+  "image": "images/prizes/prize_06_vacuum_20l.png"
+ },
+ {
+  "name": "YENDARE 批头（卡装）",
+  "price": 0,
+  "tier": "purple",
+  "cells": 2,
+  "flip": false,
+  "image": "images/prizes/prize_07_bits_card.png"
+ },
+ {
+  "name": "YENDARE 批头（盒装·手持图）",
+  "price": 0,
+  "tier": "purple",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_08_bits_case_hand.png"
+ },
+ {
+  "name": "钻头批头套装",
+  "price": 0,
+  "tier": "purple",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_09_drill_set.png"
+ },
+ {
+  "name": "卷尺 8m",
+  "price": 0,
+  "tier": "blue",
+  "cells": 1,
+  "flip": false,
+  "image": "images/prizes/prize_10_tape_8m.png"
+ },
+ {
+  "name": "卷尺 3m",
+  "price": 0,
+  "tier": "blue",
+  "cells": 1,
+  "flip": false,
+  "image": "images/prizes/prize_11_tape_3m.png"
+ },
+ {
+  "name": "卷尺 7.5m",
+  "price": 0,
+  "tier": "blue",
+  "cells": 1,
+  "flip": false,
+  "image": "images/prizes/prize_12_tape_75m.png"
+ },
+ {
+  "name": "组合工具箱（小）",
+  "price": 0,
+  "tier": "purple",
+  "cells": 6,
+  "flip": true,
+  "image": "images/prizes/prize_13_toolbox_s.png"
+ },
+ {
+  "name": "组合工具箱（中）",
+  "price": 0,
+  "tier": "purple",
+  "cells": 6,
+  "flip": true,
+  "image": "images/prizes/prize_14_toolbox_m.png"
+ },
+ {
+  "name": "组合工具箱（大）",
+  "price": 0,
+  "tier": "gold",
+  "cells": 9,
+  "flip": false,
+  "image": "images/prizes/prize_15_toolbox_l.png"
+ },
+ {
+  "name": "工具箱拖车",
+  "price": 0,
+  "tier": "purple",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_16_trolley.png"
+ },
+ {
+  "name": "钻孔集尘器",
+  "price": 0,
+  "tier": "purple",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_17_dust_collector.png"
+ },
+ {
+  "name": "AKAIDO 反光背心",
+  "price": 0,
+  "tier": "purple",
+  "cells": 9,
+  "flip": false,
+  "image": "images/prizes/prize_18_vest.png"
+ },
+ {
+  "name": "AKAIDO 长柄工具",
+  "price": 0,
+  "tier": "blue",
+  "cells": 2,
+  "flip": false,
+  "image": "images/prizes/prize_19_long_tool.png"
+ },
+ {
+  "name": "YENDARE 批头（盒装）",
+  "price": 0,
+  "tier": "blue",
+  "cells": 4,
+  "flip": false,
+  "image": "images/prizes/prize_20_bits_case.png"
+ },
+ {
+  "name": "AKAIDO T恤",
+  "price": 0,
+  "tier": "purple",
+  "cells": 9,
+  "flip": false,
+  "image": "images/prizes/prize_21_tshirt.png"
+ },
+ {
+  "name": "AKAIDO 工具包",
+  "price": 0,
+  "tier": "purple",
+  "cells": 6,
+  "flip": true,
+  "image": "images/prizes/prize_22_tool_bag.png"
+ }
+]
