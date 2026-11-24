@@ -7,8 +7,17 @@ canvas{position:absolute;left:0;top:0}
 .b{position:absolute;color:#fff;background:rgba(255,255,255,.1);border:1px solid #f5c842;font-size:16px;text-align:center;line-height:38px;height:40px;cursor:pointer;box-sizing:border-box}
 .b:active{background:rgba(255,255,255,.3)}
 #ti{position:absolute;left:440px;top:674px;width:400px;height:44px;background:rgba(0,0,0,.6);border:1px solid #f5c842;color:#f5c842;font-size:34px;font-weight:bold;text-align:center;display:none;font-family:inherit;outline:none}
-#vp{position:absolute;left:20px;top:300px;width:300px;padding:14px;background:rgba(10,14,20,.92);border:1px solid #f5c842;color:#fff;display:none;font-size:16px;box-sizing:border-box}
+#vp{position:absolute;left:23px;top:257px;width:300px;padding:14px;background:rgba(10,14,20,.92);border:1px solid #f5c842;color:#fff;display:none;font-size:16px;box-sizing:border-box}
 #vp input{width:100%;margin:6px 0 14px}
+.pn{position:absolute;display:none;background:rgba(0,0,0,.88);border:2px solid #3e54c8;color:#fff;box-sizing:border-box;z-index:5}
+.pn h2{margin:0;text-align:center;color:#f5c842;font-size:28px;line-height:60px}.pn .x{position:absolute;right:14px;top:12px;width:36px;height:36px;font-size:22px;line-height:34px}
+.bd{position:absolute;left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch}.bd::-webkit-scrollbar{width:6px}.bd::-webkit-scrollbar-thumb{background:#3e54c8}
+.pn h3{margin:14px 0 8px;font-size:20px}.gr{position:relative;width:648px;margin:0 auto 20px}
+.it{position:absolute;box-sizing:border-box;border:2px solid;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.it img{max-width:88%;max-height:80%;object-fit:contain}.it span{position:absolute;bottom:1px;font-size:11px;color:#ccd;text-shadow:0 0 3px #000;white-space:nowrap}
+table{border-collapse:collapse;margin:0 auto;font-size:15px}td{padding:6px 5px}table input{background:#111;color:#fff;border:1px solid #556;padding:6px;font-size:15px;font-family:inherit}
+.cb,.tb,.fb{display:inline-block;min-width:30px;height:30px;line-height:30px;text-align:center;border:1px solid #667;margin:0 2px;cursor:pointer;color:#ccd;box-sizing:border-box}.on{background:#3e54c8;color:#fff;border-color:#fff}
+.tb{width:30px;border-radius:50%}.tb.on{outline:2px solid #fff}
 #start{position:absolute;inset:0;background:rgba(0,0,0,.85);color:#f5c842;font-size:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9}
 </style></head><body>
 <div id="stage"><canvas id="c" width="1280" height="720"></canvas>
@@ -16,6 +25,8 @@ canvas{position:absolute;left:0;top:0}
 <div class="b" id="tb" style="left:1115px;top:14px;width:150px">编辑标题</div>
 <div class="b" id="rb" style="left:1005px;top:14px;width:100px">重置奖池</div>
 <input id="ti" maxlength="16"><div id="vp">音效<input type="range" id="sv" min="0" max="1" step=".05">背景音乐<input type="range" id="bv" min="0" max="1" step=".05"></div>
+<div class="pn" id="pv" style="left:272px;top:40px;width:736px;height:640px"><h2>奖 品 一 览</h2><div class="b x" id="pvx">×</div><div class="bd" id="pvb" style="top:64px;bottom:20px"></div></div>
+<div class="pn" id="ad" style="left:130px;top:20px;width:1100px;height:530px"><h2>奖 品 管 理</h2><div class="b x" id="adx">×</div><div style="text-align:center;font-size:13px;color:#aab;margin-top:-6px">直接改名称/价格 · 点格子数、颜色切换 · 「翻转」横竖互换 · 自动保存</div><div class="bd" id="adb" style="top:76px;bottom:12px"></div></div>
 <div id="start">点击屏幕开始</div></div>
 <script>
 const W=1280,H=720,$=id=>document.getElementById(id),cv=$('c'),g=cv.getContext('2d'),stage=$('stage');
@@ -32,25 +43,36 @@ function play(k){const a=snd[k];if(!a)return;a.volume=Math.min(1,(k=='bgm'?S.bv:
 function stop(k){snd[k].pause();snd[k].currentTime=0}
 function applyVol(){snd.bgm.volume=S.bv;snd.decrypt.volume=Math.min(1,S.sv*.5)}
 let prizes=[],pool=[],opened={},sel=null,st='menu',t0=0,cur=null,prize=null,pz={},blurBg={};
-fetch('prizes.json').then(r=>r.json()).then(d=>{prizes=d;resetPool()}).catch(()=>{});
-function resetPool(){pool=prizes.slice();newGroup()}
+fetch('prizes.json').then(r=>r.json()).then(d=>{try{const l=JSON.parse(localStorage.getItem('lp')||'null');if(Array.isArray(l)&&l.length)d=l}catch(e){}prizes=d;resetPool()}).catch(()=>{});
+let grpNo=1;const SZ={1:[1,1],2:[1,2],4:[2,2],6:[2,3],9:[3,3]},TN={red:'红',gold:'金',purple:'紫',blue:'蓝'},sz=p=>{const[w,h]=SZ[p.cells]||[2,2];return p.flip?[h,w]:[w,h]};
+const savePr=()=>localStorage.setItem('lp',JSON.stringify(prizes));
+function resetPool(){pool=prizes.slice();grpNo=1;newGroup()}
 function newGroup(){opened={};sel=null;grp=Math.min(24,pool.length)}let grp=0;
 function pick(){const ts=Object.keys(TIERS).filter(t=>pool.some(p=>p.tier==t));const tot=ts.reduce((a,t)=>a+TIERS[t].w,0);let r=Math.random()*tot,t=ts[0];for(const x of ts){if((r-=TIERS[x].w)<0){t=x;break}}
  const l=pool.filter(p=>p.tier==t),p=l[Math.random()*l.length|0];pool.splice(pool.indexOf(p),1);return p}
 function bgFor(){const p=SCN[S.scene].p+'background.png',im=img(p);if(!im.complete||!im.naturalWidth)return null;
  if(!blurBg[p]){const o=document.createElement('canvas');o.width=W;o.height=H;const c=o.getContext('2d');c.filter='blur(8px)';c.drawImage(im,-20,-20,W+40,H+40);c.filter='none';c.fillStyle='rgba(0,0,0,.16)';c.fillRect(0,0,W,H);blurBg[p]=o}return blurBg[p]}
+function geo(im,w,F,mx,my,right){if(!im.complete||!im.naturalWidth)return null;const k=w/(im.naturalWidth*F[1]),aw=im.naturalWidth*k,ah=im.naturalHeight*k,left=right?W-mx-(F[0]+F[1])*aw:mx-F[0]*aw,top=H-(my-F[2]*ah)-ah;return{l:left,t:top,w:aw,h:ah}}
+const hz=(g,F)=>g&&{x:g.l+F[0]*g.w,y:g.t+F[1]*g.h,w:(F[2]-F[0])*g.w,h:(F[3]-F[1])*g.h},inr=(r,x,y)=>r&&x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;
+const A=()=>geo(img('images/audio_idle.png'),270,[.05012,.8926,.09129],6,30,false),PR=()=>geo(img('images/props_idle.png'),240,[.11659,.76683,.14407],6,4,true);
+const SPK=[.22076,.05758,.45883,.44171],BOX=[.05012,.29494,.94272,.90871],PHIT=[.35506,.16241,.71118,.43353];let mx=0,my=0,pvOpen=false,adOpen=false;
 const cell=i=>[640+((i%6)-2.5)*156,179+(i/6|0)*106];
 function txt(s,x,y,sz,col,al){g.font=`bold ${sz}px "Microsoft YaHei","PingFang SC",sans-serif`;g.fillStyle=col||'#fff';g.textAlign=al||'center';g.textBaseline='middle';g.fillText(s,x,y)}
 function cover(im,x,y,w,h){if(!im.complete||!im.naturalWidth)return;const k=Math.max(w/im.naturalWidth,h/im.naturalHeight),dw=im.naturalWidth*k,dh=im.naturalHeight*k;g.drawImage(im,x+(w-dw)/2,y+(h-dh)/2,dw,dh)}
 function contain(im,cx,cy,w,h){if(!im.complete||!im.naturalWidth)return;const k=Math.min(w/im.naturalWidth,h/im.naturalHeight),dw=im.naturalWidth*k,dh=im.naturalHeight*k;g.drawImage(im,cx-dw/2,cy-dh/2,dw,dh)}
 function drawMenu(){const sc=SCN[S.scene],P=sc.p,fo=sc.fo;const b=bgFor();if(b)g.drawImage(b,0,0);else{g.fillStyle='#10161c';g.fillRect(0,0,W,H)}
  const ox=172,oy=126,ow=936,oh=424;g.save();g.beginPath();g.rect(ox,oy,ow,oh);g.clip();cover(img(P+'cabinet_wall.png'),ox,oy,ow,oh);g.restore();
- for(let i=0;i<24;i++){const [cx,cy]=cell(i),p=opened[i];const im=img(p?P+'safe_open_'+p.tier+'.png':P+'safe_closed.png');cover(im,cx-75,cy-50,150,100);
-  if(p){const pi=img(p.image);contain(pi,cx,cy+6,92,62)}
+ for(let i=0;i<(grp||24);i++){const [cx,cy]=cell(i),p=opened[i];const im=img(p?P+'safe_open_'+p.tier+'.png':P+'safe_closed.png');cover(im,cx-75,cy-50,150,100);
+  if(p){const pi=img(p.image);contain(pi,cx,cy+6,92,62)}else{txt(i+1,cx+64,cy+43,12,'#e6e8f0')}
   if(sel==i&&!p){g.strokeStyle='#f5c842';g.lineWidth=3;g.strokeRect(cx-75,cy-50,150,100);g.fillStyle='rgba(0,0,0,.6)';g.fillRect(cx-48,cy-19,96,38);g.strokeRect(cx-48,cy-19,96,38);txt('打 开',cx,cy,20,'#f5c842')}}
  const fw=ow/fo[2],fh=oh/fo[3],fi=img(P+'cabinet_frame.png');if(fi.complete)g.drawImage(fi,ox-fo[0]*fw,oy-fo[1]*fh,fw,fh);
- const au=img('images/audio_idle.png');if(au.complete){const aw=270,ah=aw*au.naturalHeight/au.naturalWidth;g.drawImage(au,-9,H-30-ah+ah*.09,aw*1.0,ah)}
- txt(`本组 ${Object.keys(opened).length}/${grp}　奖池剩余 ${pool.length}`,1262,700,20,'#cfd6e0','right');
+ const ag=A(),pg=PR(),busy=pvOpen||adOpen,spk=!busy&&inr(hz(ag,SPK),mx,my),box=!busy&&!spk&&inr(hz(ag,BOX),mx,my),ph=!busy&&inr(hz(pg,PHIT),mx,my);
+ if(ag){if(spk)g.drawImage(img('images/audio_spk_glow.png'),ag.l,ag.t,ag.w,ag.h);if(box||adOpen)g.drawImage(img('images/audio_red_glow.png'),ag.l,ag.t,ag.w,ag.h);g.drawImage(img('images/audio_idle.png'),ag.l,ag.t,ag.w,ag.h)}
+ if(pg){if(ph||pvOpen)g.drawImage(img('images/props_glow.png'),pg.l,pg.t,pg.w,pg.h);g.drawImage(img(ph||pvOpen?'images/props_open.png':'images/props_idle.png'),pg.l,pg.t,pg.w,pg.h)}
+ const tg=Math.max(1,Math.ceil(prizes.length/24));txt((tg>1?`第 ${grpNo} / ${tg} 组      `:'')+`剩余奖品: ${pool.length}`,640,53,18,'#c8cdd7');
+ const done=Object.keys(opened).length>=grp&&grp>0;
+ if(done){if(pool.length){g.fillStyle='rgba(255,255,255,.14)';g.fillRect(540,618,200,44);g.strokeStyle='#f5c842';g.lineWidth=1;g.strokeRect(540,618,200,44);txt('刷 新',640,640,22)}else txt('奖品已抽完！按 R 重新开始',640,645,28,'#f5c842')}
+ else txt('点击一个保险柜，再点「打开」',640,645,20,'#d7dce8');
  if(!pool.length&&!prizes.length)txt('读取 prizes.json 中…（需通过网址打开）',640,360,26)}
 const TH=document.createElement('div');
 function drawPuzzle(now){g.fillStyle='rgba(0,0,0,.78)';g.fillRect(0,0,W,H);txt('解 密',640,200,44,'#f5c842');txt(`点击屏幕 / 按空格，在绿色区内停住指针（${pz.n}/3）`,640,262,22);
@@ -69,14 +91,32 @@ function drawReveal(now){const c=TIERS[prize.tier].c,a=Math.min(1,(now-t0)/400);
 function loop(now){g.clearRect(0,0,W,H);drawMenu();
  g.fillStyle='#f5c842';g.font='bold 34px "Microsoft YaHei",sans-serif';if(st=='menu'&&!editing)txt(S.title,640,23,34,'#f5c842');
  if(st=='puzzle')drawPuzzle(now);else if(st=='search')drawSearch(now);else if(st=='reveal')drawReveal(now);requestAnimationFrame(loop)}
+function buildPV(){const el=$('pvb');el.innerHTML='';for(const t of['red','gold','purple','blue']){const its=prizes.filter(p=>p.tier==t).sort((a,b)=>b.cells-a.cells);if(!its.length)continue;
+ const used=new Set();let rows=0,h='';for(const p of its){const[w,hh]=sz(p);let gy=0,gx=null;while(gx===null){for(let x=0;x<=9-w;x++){let ok=true;for(let i=0;i<w;i++)for(let j=0;j<hh;j++)if(used.has((x+i)+','+(gy+j)))ok=false;if(ok){gx=x;break}}if(gx===null)gy++}
+  for(let i=0;i<w;i++)for(let j=0;j<hh;j++)used.add((gx+i)+','+(gy+j));rows=Math.max(rows,gy+hh);h+=`<div class="it" style="left:${gx*72}px;top:${gy*72}px;width:${w*72-4}px;height:${hh*72-4}px;border-color:${TIERS[t].c}"><img src="${p.image}"><span>${p.name}</span></div>`}
+ el.insertAdjacentHTML('beforeend',`<h3 style="color:${TIERS[t].c};width:648px;margin:14px auto 8px">${TN[t]} · ${its.length} 件</h3><div class="gr" style="height:${rows*72}px">${h}</div>`)}}
+function buildAD(){let h='<table>';prizes.forEach((p,i)=>{h+=`<tr data-i="${i}"><td><input class="nm" maxlength="24" value="${p.name.replace(/"/g,'&quot;')}" size="24"></td><td><input class="pr" type="number" min="0" value="${p.price||0}" style="width:80px"></td><td>${[1,2,4,6,9].map(c=>`<span class="cb${p.cells==c?' on':''}" data-c="${c}">${c}</span>`).join('')}<span class="fb${p.flip?' on':''}" style="padding:0 8px">翻转</span></td><td>${['blue','purple','gold','red'].map(t=>`<span class="tb${p.tier==t?' on':''}" data-t="${t}" style="background:${TIERS[t].c}"></span>`).join('')}</td></tr>`});$('adb').innerHTML=h+'</table>'}
+$('adb').addEventListener('input',e=>{const r=e.target.closest('tr'),p=prizes[r.dataset.i];if(e.target.className=='nm')p.name=e.target.value;else p.price=+e.target.value||0;savePr()});
+$('adb').addEventListener('click',e=>{const r=e.target.closest('tr');if(!r)return;const p=prizes[r.dataset.i],c=e.target;if(c.dataset.c)p.cells=+c.dataset.c;else if(c.classList.contains('fb'))p.flip=!p.flip;else if(c.dataset.t)p.tier=c.dataset.t;else return;savePr();const y=$('adb').scrollTop;buildAD();$('adb').scrollTop=y});
+$('pvx').onclick=()=>togPV(false);$('adx').onclick=()=>togAD(false);
 let editing=false;
 function pos(e){const r=cv.getBoundingClientRect(),t=e.touches?e.touches[0]||e.changedTouches[0]:e;return[(t.clientX-r.left)*W/r.width,(t.clientY-r.top)*H/r.height]}
-cv.addEventListener('pointerdown',e=>{const[x,y]=pos(e);$('vp').style.display=(st=='menu'&&x<290&&y>520)?($('vp').style.display=='block'?'none':'block'):'none';
+cv.addEventListener('pointermove',e=>{[mx,my]=pos(e)});
+function togPV(on){pvOpen=on;$('pv').style.display=on?'block':'none';if(on){buildPV();$('pvb').scrollTop=0;play('box')}else play('click')}
+function togAD(on){if(on&&!adOpen)buildAD();else if(!on&&adOpen){savePr();buildPV()}adOpen=on;$('ad').style.display=on?'block':'none';if(on)play('box')}
+cv.addEventListener('pointerdown',e=>{const[x,y]=pos(e);mx=x;my=y;
+ if(pvOpen){togPV(false);return}if(adOpen){togAD(false);return}
+ if(st=='menu'){const ag=A(),pg=PR();
+  if(inr(hz(pg,PHIT),x,y)){$('vp').style.display='none';return togPV(true)}
+  if(inr(hz(ag,SPK),x,y)){$('vp').style.display=$('vp').style.display=='block'?'none':'block';return}
+  if(inr(hz(ag,BOX),x,y)){$('vp').style.display='none';return togAD(true)}
+  $('vp').style.display='none';
+  if(Object.keys(opened).length>=grp&&grp>0&&pool.length&&x>540&&x<740&&y>618&&y<662){grpNo++;newGroup();play('click');return}}
  if(st=='puzzle')return hitPz();
- if(st=='reveal'){if(performance.now()-t0<500)return;opened[cur]=prize;st='menu';sel=null;if(Object.keys(opened).length>=grp&&pool.length){setTimeout(newGroup,1200)}return}
+ if(st=='reveal'){if(performance.now()-t0<500)return;opened[cur]=prize;st='menu';sel=null;return}
  if(st!='menu'||editing)return;
  for(let i=0;i<24;i++){const[cx,cy]=cell(i);if(Math.abs(x-cx)<75&&Math.abs(y-cy)<50&&!opened[i]){if(sel==i&&Math.abs(x-cx)<48&&Math.abs(y-cy)<19){if(pool.length)startPuzzle(i)}else{sel=i;play('click')}return}}sel=null});
-addEventListener('keydown',e=>{if(e.code=='Space'&&st=='puzzle'){e.preventDefault();hitPz()}if(e.key=='Enter'&&editing)endEdit(true);if(e.key=='Escape'&&editing)endEdit(false)});
+addEventListener('keydown',e=>{if(e.target.tagName=='INPUT'&&e.target.id!='ti')return;if(e.key=='Escape'){if(pvOpen)togPV(false);if(adOpen)togAD(false)}if((e.key=='r'||e.key=='R')&&st=='menu'&&!editing&&!pvOpen&&!adOpen&&confirm('重新开始？'))resetPool();if(e.code=='Space'&&st=='puzzle'){e.preventDefault();hitPz()}if(e.key=='Enter'&&editing)endEdit(true);if(e.key=='Escape'&&editing)endEdit(false)});
 function setScene(n){S.scene=n;$('sb').textContent='场景：'+SCN[n].n+'（点击切换）';save()}
 $('sb').onclick=()=>{if(st=='menu')setScene((S.scene+1)%SCN.length)};setScene(S.scene);
 function endEdit(ok){if(!editing)return;editing=false;if(ok)S.title=$('ti').value.trim()||'保 险 柜 抽 奖';save();$('ti').style.display='none';$('tb').textContent='编辑标题'}
